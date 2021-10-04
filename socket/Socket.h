@@ -15,7 +15,6 @@ class Socket {
   Socket() = default;
   Socket(const Socket&) = delete;
   virtual ~Socket() {
-    std::cout << __func__ << ": handle: " << m_handle << std::endl;
     (void)close();
   }
 
@@ -53,7 +52,7 @@ protected:
   explicit Socket(int handle) : m_handle(handle) {}
 
 protected:
-  int m_handle{-1};
+  int m_handle{InvalidSocketHandle};
 };
 
 } // end namespace pw_socket

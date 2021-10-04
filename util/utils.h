@@ -36,7 +36,7 @@ namespace pw_util {
     return Handle(handle);
   }
 
-  static void AddHandleToEpoll(const Handle& epollHandle, const int& handle, uint32_t events) {
+  static void AddHandleToEpoll(Handle& epollHandle, const int& handle, uint32_t events) {
     epoll_event ev {
       .events = events,
       .data = {
@@ -45,7 +45,7 @@ namespace pw_util {
     };
 
     // std::cerr << "Adding handle to epoll: " << handle << std::endl;
-    auto r = epoll_ctl(epollHandle.value(), EPOLL_CTL_ADD, handle, &ev);
+    auto r = epoll_ctl(epollHandle, EPOLL_CTL_ADD, handle, &ev);
     if (r == -1) {
       throw std::runtime_error(std::string("Failed to add handle to epoll: ").append(std::to_string(handle) + " - " + strerror(errno)));
     }
@@ -77,4 +77,5 @@ namespace pw_util {
     }
   }
 } // end namespace pw_util
+
 #endif // PW_UTILS_H

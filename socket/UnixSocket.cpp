@@ -15,13 +15,10 @@ UnixSocket::UnixSocket(const std::string& endpoint)
 
 UnixSocket::UnixSocket(int handle)
   : Socket(handle)
-{
-  std::cout << __func__ << ": handle: " << m_handle << std::endl;
-}
+{}
 
 UnixSocket::~UnixSocket()
-{
-}
+{}
 
 bool UnixSocket::create()
 {
