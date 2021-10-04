@@ -19,7 +19,9 @@ UnixSocket::UnixSocket(int handle)
 {}
 
 UnixSocket::~UnixSocket()
-{}
+{
+  close();
+}
 
 bool UnixSocket::create()
 {
