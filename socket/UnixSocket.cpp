@@ -51,7 +51,7 @@ bool UnixSocket::connect()
   return true;
 }
 
-bool UnixSocket::listen(bool everyone)
+bool UnixSocket::listen(bool everyone, uint32_t queueSize)
 {
   if (m_handle == InvalidSocketHandle) {
     errx(ENOTSOCK, "Invalid socket handle");
@@ -83,6 +83,7 @@ bool UnixSocket::listen(bool everyone)
     chmod(m_endpoint.c_str(), 0777);
   }
 
+  r = ::listen(m_handle, queueSize);
   if (r == -1) {
     err(errno, "Unable to configure socket %s for accepting connections", name());
     return false;

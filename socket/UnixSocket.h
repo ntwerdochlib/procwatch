@@ -39,7 +39,7 @@ public:
    * @param everyone - true to allow any process to connect, false to keep the permissions of the process calling listen()
    * @return true on sucess, false on failure
    */
-  bool listen(bool everyone);
+  bool listen(bool everyone, uint32_t queueSize);
   /**
    * @copydoc Socket::send
    */
