@@ -1,7 +1,5 @@
 #include "ProcWatchSvr.h"
 
-#include <algorithm>
-#include <functional>
 #include <iostream>
 #include <list>
 

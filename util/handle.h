@@ -40,10 +40,6 @@ public:
     return value();
   }
 
-  // operator const int& () {
-  //   return value();
-  // }
-
   const int& value() const { return m_handle; }
 
 private:

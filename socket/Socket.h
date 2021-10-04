@@ -53,6 +53,7 @@ protected:
 protected:
   int m_handle{-1};
 };
+
 } // end namespace pw_socket
 
 #endif // SOCKET_H

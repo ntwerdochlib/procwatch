@@ -69,6 +69,7 @@ bool NetlinkSocket::recv(void* buffer, std::size_t bytes)
 bool NetlinkSocket::listenForEvents(bool enable)
 {
   pw_socket::netlink::NetlinkListenMessage listenRequest {0};
+
   listenRequest.hdr.nlmsg_len = sizeof(listenRequest);
   listenRequest.hdr.nlmsg_type = NLMSG_DONE;
   listenRequest.hdr.nlmsg_pid = static_cast<__u32>(getpid());
@@ -77,26 +78,6 @@ bool NetlinkSocket::listenForEvents(bool enable)
   listenRequest.msg.len = sizeof (proc_cn_mcast_op);
   listenRequest.mcast = (enable ? PROC_CN_MCAST_LISTEN : PROC_CN_MCAST_IGNORE);
   return send(&listenRequest, sizeof(listenRequest));
-
-	// struct __attribute__ ((aligned(NLMSG_ALIGNTO))) {
-	// 		struct nlmsghdr nl_hdr;
-	// 		struct __attribute__ ((__packed__)) {
-	// 		struct cn_msg cn_msg;
-	// 		enum proc_cn_mcast_op cn_mcast;
-	// 		};
-	// } nlcn_msg;
-
-	// memset(&nlcn_msg, 0, sizeof(nlcn_msg));
-	// nlcn_msg.nl_hdr.nlmsg_len = sizeof(nlcn_msg);
-	// nlcn_msg.nl_hdr.nlmsg_pid = getpid();
-	// nlcn_msg.nl_hdr.nlmsg_type = NLMSG_DONE;
-
-	// nlcn_msg.cn_msg.id.idx = CN_IDX_PROC;
-	// nlcn_msg.cn_msg.id.val = CN_VAL_PROC;
-	// nlcn_msg.cn_msg.len = sizeof(enum proc_cn_mcast_op);
-
-	// nlcn_msg.cn_mcast = enable ? PROC_CN_MCAST_LISTEN : PROC_CN_MCAST_IGNORE;
-  // return send(&nlcn_msg, sizeof(nlcn_msg));
 }
 
 } // end namespace pw_socket
