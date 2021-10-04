@@ -1,3 +1,8 @@
+/**
+ * @brief procwatch server
+ * Allows for a single client connection from a procwatch client and send details
+ * for all new processes created for the duration of the client connection.
+ */
 #include "ProcWatchSvr.h"
 
 #include <err.h>

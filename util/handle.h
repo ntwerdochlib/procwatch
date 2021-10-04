@@ -7,6 +7,12 @@
 #include <unistd.h>
 
 namespace pw_util {
+/**
+ * @brief Class representing a basic unix handle, providing auto close on destruction
+ * @note Class is not copyable
+ * @author Nik Twerdochlib
+ * @since Sun Oct 03 2021
+ */
 class Handle
 {
 public:

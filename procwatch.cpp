@@ -1,3 +1,8 @@
+/**
+ * @brief procwatch client
+ * Connects to the procwatch server and displays information recieved regarding new process
+ * created through the lifespan of the connection
+ */
 #include "socket/UnixSocket.h"
 
 #include <iostream>
