@@ -28,37 +28,29 @@ int main(int argc, char* argv[])
     std::cout << "Running...\n";
     while (running && epoll_wait(epollHandle, &ev, 1, -1) > 0) {
       if (ev.data.fd == signalHandle) {
-        std::cerr << __func__ << ": Got signal\n";
-        signalfd_siginfo si{};
-        if (read(signalHandle, &si, sizeof(si)) != sizeof(si)) {
-          std::cerr << "failed to read recieved signal info\n";
-          running = false;
-          break;
-        }
-        switch (si.ssi_signo) {
-          case SIGHUP:
-          case SIGTERM:
-          case SIGINT:
-          case SIGQUIT:
-            std::cout << __func__ << ": Got signal, shutting down\n";
-            running = false;
-            break;
-          default:
-            break;
-        }
+        std::cerr << __func__ << ": Got signal, exiting\n";
+        break;
       } else if (ev.data.fd == socket) {
-        std::array<char, 256> buffer;
-        socket.recv(buffer.data(), buffer.size());
-        std::cout << "Server sent: " << buffer.data() << std::endl;
-        running = false;
+        std::array<char, pw_config::MaxMessageSize + 1> buffer{0};
+        size_t bytesRcvd{0};
+        if (!socket.recv(buffer.data(), buffer.size(), &bytesRcvd)) {
+          if (bytesRcvd < 1) {
+            throw std::runtime_error("recieve error");
+          }
+        }
+        std::cout << buffer.data();
+        if (ev.events & EPOLLHUP) {
+          std::cout << "Client exiting\n";
+          running = false;
+          continue;
+        }
       }
     }
 
+    std::cout << "Finished\n";
     return 0;
   } catch (std::exception const& e) {
     std::cerr << "Exception: " << e.what() << std::endl;
     return -9;
   }
-  std::cout << "Finished\n";
-  return 0;
 }

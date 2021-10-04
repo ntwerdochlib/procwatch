@@ -2,40 +2,31 @@
 #define PROC_WATCH_SVR_H
 #pragma once
 
-#include <atomic>
-#include <list>
+#include <linux/cn_proc.h>
+
 #include <thread>
 
 #include "socket/UnixSocket.h"
 
 class ProcWatchSvr
 {
-public:
   using client_t = std::shared_ptr<pw_socket::UnixSocket>;
-
-  ProcWatchSvr();
+public:
+  ProcWatchSvr() = default;
   ProcWatchSvr(const ProcWatchSvr&) = delete;
   ProcWatchSvr(ProcWatchSvr&&) = delete;
 
-  ~ProcWatchSvr();
+  ~ProcWatchSvr() = default;
 
   ProcWatchSvr& operator=(const ProcWatchSvr&) = delete;
   ProcWatchSvr& operator=(ProcWatchSvr&&) = delete;
 
-  void start();
-  void shutdown();
-
-  bool running() const { return m_thread.joinable(); }
-
-  auto const& clients() const { return m_clients; }
-
-protected:
   void run(std::stop_token stopToken);
 
 private:
-  std::atomic_bool m_running { false };
-  std::jthread m_thread;
-  std::list<client_t> m_clients;
+  void handleNetlinkEvent(const proc_event& ev, const client_t& client);
+  inline std::string getProcBinaryPath(uint32_t pid) const;
+  inline std::string getProcCommandLine(uint32_t pid) const;
 };
 
 #endif // PROC_WATCH_SVR_H
