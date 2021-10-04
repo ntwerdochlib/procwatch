@@ -22,8 +22,9 @@ public:
   bool recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd = nullptr) override;
   bool close() override;
 
-  std::shared_ptr<UnixSocket> waitForConnection();
-  static std::shared_ptr<UnixSocket> acceptConnection(int handle);
+  const char* name() const {
+    return m_endpoint.c_str() + (m_endpoint[0] == 0x00 ? 1 : 0);
+  }
 
 protected:
   explicit UnixSocket(int handle);

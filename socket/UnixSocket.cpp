@@ -24,7 +24,7 @@ bool UnixSocket::create()
 {
   m_handle = socket(AF_UNIX, SOCK_STREAM, 0);
   if (InvalidSocketHandle == m_handle) {
-    err(errno, "Failed to create unix socket: %s", m_endpoint.c_str());
+    err(errno, "Failed to create unix socket: %s", name());
     return false;
   }
   return true;
@@ -43,7 +43,7 @@ bool UnixSocket::connect()
   memcpy(sa.sun_path, m_endpoint.c_str(), m_endpoint.size());
   auto const r = ::connect(m_handle, reinterpret_cast<sockaddr*>(&sa), sizeof(sa));
   if (r == -1) {
-    err(errno, "Failed to connect to socket: %s", m_endpoint.c_str());
+    err(errno, "Failed to connect to socket: %s", name());
     return false;
   }
 
@@ -62,21 +62,24 @@ bool UnixSocket::listen()
   };
   memcpy(sa.sun_path, m_endpoint.c_str(), m_endpoint.size());
 
+  if (m_endpoint[0] != 0x00) {
+    // Only unlink for non hidden domain sockets
   auto r = unlink(m_endpoint.c_str());
   if (r != 0 && errno != ENOENT) {
-    err(errno, "%d Failed to remove existing socket endpoint for %s", errno, m_endpoint.c_str());
+      err(errno, "%d Failed to remove existing socket endpoint for %s", errno, name());
     return false;
   }
+  }
 
-  r = bind(m_handle, reinterpret_cast<sockaddr*>(&sa), sizeof(sa));
+  auto r = bind(m_handle, reinterpret_cast<sockaddr*>(&sa), sizeof(sa));
   if (r == -1) {
-    err(errno, "Unable to bind to socket %s", m_endpoint.c_str());
+    err(errno, "Unable to bind to socket %s", name());
     return false;
   }
 
   r = ::listen(m_handle, 10);
   if (r == -1) {
-    err(errno, "Unable to configure socket %s for accepting connections", m_endpoint.c_str());
+    err(errno, "Unable to configure socket %s for accepting connections", name());
     return false;
   }
 
@@ -87,7 +90,7 @@ bool UnixSocket::close()
 {
   auto const r = Socket::close();
   if (!r) {
-    err(errno, "Failed to close socket: %s", m_endpoint.c_str());
+    err(errno, "Failed to close socket: %s", name());
   }
   return r;
 }
@@ -99,7 +102,7 @@ bool UnixSocket::send(const void* buffer, std::size_t bytes, std::size_t* bytesS
     *bytesSent = r;
   }
   if (r <= 0) {
-    err(errno, "Failed sending %d bytes on socket: %s", bytes, m_endpoint.c_str());
+    err(errno, "Failed sending %d bytes on socket: %s", bytes, name());
     return false;
   }
   return true;
@@ -111,8 +114,9 @@ bool UnixSocket::recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd)
   if (*bytesRcvd) {
     *bytesRcvd = r;
   }
+  // std::cout << __func__ << ": r: " << r << " errno: " << errno << std::endl;
   if (r <= 0) {
-    err(errno, "Failed recieving %d bytes on socket: %s", bytes, m_endpoint.c_str());
+    err(errno, "Failed recieving %d bytes on socket: %s", bytes, name());
     return false;
   }
   return true;
