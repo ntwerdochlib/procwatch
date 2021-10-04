@@ -91,7 +91,7 @@ Testing was performed on the following releases:
 
  - Debian 11 Bullseye X64
  - Linux Mint 20.2 Uma X64
- - Debian 10 Buster armv71
+ - Ubuntu 21.04 Hisute Hippo aarch64
 
 @section sec3 Assumptions & Limitations
 @par
