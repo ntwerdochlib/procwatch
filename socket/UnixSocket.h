@@ -20,6 +20,9 @@ public:
   bool listen() override;
   bool listen(bool everyone);
   bool send(const void* buffer, std::size_t bytes, std::size_t* bytesSent = nullptr) override;
+  bool send(const std::string& buffer) {
+    return send(buffer.data(), buffer.size() + 1);
+  }
   bool recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd = nullptr) override;
   bool close() override;
 
