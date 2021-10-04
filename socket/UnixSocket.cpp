@@ -115,7 +115,7 @@ bool UnixSocket::send(const void* buffer, std::size_t bytes, std::size_t* bytesS
     err(errno, "Failed sending %d bytes on socket: %s", bytes, name());
     return false;
   }
-  return true;
+  return (r == bytes);
 }
 
 bool UnixSocket::recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd)

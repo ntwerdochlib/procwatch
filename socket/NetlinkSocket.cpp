@@ -54,8 +54,7 @@ bool NetlinkSocket::send(const void* buffer, std::size_t bytes, std::size_t* byt
     err(errno, "Failed sending %d bytes on netlink socket", bytes);
     return false;
   }
-
-  return true;
+  return (r == bytes);
 }
 
 bool NetlinkSocket::recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd)
