@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
             throw std::runtime_error("recieve error");
           }
         }
+        buffer[bytesRcvd] = 0x00;
         std::cout << buffer.data();
         if (ev.events & EPOLLHUP) {
           std::cout << "Client exiting\n";
