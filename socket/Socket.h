@@ -13,11 +13,13 @@ static constexpr int InvalidSocketHandle {-1};
 class Socket {
  public:
   Socket() = default;
+  Socket(const Socket&) = delete;
   virtual ~Socket() {
     std::cout << __func__ << ": handle: " << m_handle << std::endl;
     (void)close();
   }
 
+  Socket& operator=(const Socket&) = delete;
   virtual bool create() = 0;
   virtual bool connect() = 0;
 
