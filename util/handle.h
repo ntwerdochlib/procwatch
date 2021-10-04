@@ -6,6 +6,12 @@
 #include <errno.h>
 #include <unistd.h>
 
+#if defined (UNIT_TESTING)
+#define MOCK_VIRTUAL virtual
+#else
+#define MOCK_VIRTUAL
+#endif
+
 namespace pw_util {
 /**
  * @brief Class representing a basic unix handle, providing auto close on destruction
@@ -26,13 +32,19 @@ public:
   {}
 
   ~Handle() {
+    close();
+  }
+
+  MOCK_VIRTUAL bool close() {
     if (m_handle != InvalidHandleValue) {
-      auto const r = close(m_handle);
+      auto const r = ::close(m_handle);
       if (r == -1) {
         err(errno, "Failed closing handle: %d", m_handle);
       }
       m_handle = InvalidHandleValue;
+      return r != -1;
     }
+    return true;
   }
 
   Handle& operator=(const Handle&) = delete;
