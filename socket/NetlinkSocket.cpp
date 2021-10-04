@@ -44,9 +44,12 @@ bool NetlinkSocket::connect()
   return true;
 }
 
-bool NetlinkSocket::send(const void* buffer, std::size_t bytes)
+bool NetlinkSocket::send(const void* buffer, std::size_t bytes, std::size_t* bytesSent)
 {
   auto const r = ::send(m_handle, buffer, bytes, 0);
+  if (bytesSent) {
+    *bytesSent = r;
+  }
   if (r <= 0) {
     err(errno, "Failed sending %d bytes on netlink socket", bytes);
     return false;
@@ -55,9 +58,12 @@ bool NetlinkSocket::send(const void* buffer, std::size_t bytes)
   return true;
 }
 
-bool NetlinkSocket::recv(void* buffer, std::size_t bytes)
+bool NetlinkSocket::recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd)
 {
   auto const r = ::recv(m_handle, buffer, bytes, 0);
+  if (bytesRcvd) {
+    *bytesRcvd = r;
+  }
   if (r <= 0) {
     err(errno, "Failed recieving data on netlink socket");
     return false;

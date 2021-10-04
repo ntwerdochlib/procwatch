@@ -95,9 +95,12 @@ bool UnixSocket::close()
   return r;
 }
 
-bool UnixSocket::send(const void* buffer, std::size_t bytes)
+bool UnixSocket::send(const void* buffer, std::size_t bytes, std::size_t* bytesSent)
 {
   auto const r = write(m_handle, buffer, bytes);
+  if (bytesSent) {
+    *bytesSent = r;
+  }
   if (r <= 0) {
     err(errno, "Failed sending %d bytes on socket: %s", bytes, m_endpoint.c_str());
     return false;
@@ -105,9 +108,12 @@ bool UnixSocket::send(const void* buffer, std::size_t bytes)
   return true;
 }
 
-bool UnixSocket::recv(void* buffer, std::size_t bytes)
+bool UnixSocket::recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd)
 {
   auto const r = read(m_handle, buffer, bytes);
+  if (*bytesRcvd) {
+    *bytesRcvd = r;
+  }
   if (r <= 0) {
     err(errno, "Failed recieving %d bytes on socket: %s", bytes, m_endpoint.c_str());
     return false;

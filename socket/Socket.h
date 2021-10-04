@@ -25,8 +25,8 @@ class Socket {
     return false;
   }
 
-  virtual bool send(const void* buffer, std::size_t bytes) = 0;
-  virtual bool recv(void* buffer, std::size_t bytes) = 0;
+  virtual bool send(const void* buffer, std::size_t bytes, std::size_t* bytesWrote = nullptr) = 0;
+  virtual bool recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd = nullptr) = 0;
 
   virtual bool close() {
     auto r {true};

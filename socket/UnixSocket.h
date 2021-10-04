@@ -18,8 +18,8 @@ public:
   bool create() override;
   bool connect() override;
   bool listen() override;
-  bool send(const void* buffer, std::size_t bytes) override;
-  bool recv(void* buffer, std::size_t bytes) override;
+  bool send(const void* buffer, std::size_t bytes, std::size_t* bytesSent = nullptr) override;
+  bool recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd = nullptr) override;
   bool close() override;
 
   std::shared_ptr<UnixSocket> waitForConnection();
