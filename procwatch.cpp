@@ -3,11 +3,12 @@
 #include <iostream>
 
 #include "util/utils.h"
+#include "config.h"
 
 int main(int argc, char* argv[])
 {
   try {
-    pw_socket::UnixSocket socket("procwatch.socket");
+    pw_socket::UnixSocket socket(pw_config::ServerEndpoint);
     if (!socket.create()) {
       throw std::runtime_error("failed to create socket");
     }

@@ -10,9 +10,7 @@
 #include "util/utils.h"
 #include "util/handle.h"
 
-ProcWatchSvr::ProcWatchSvr()
-{
-}
+#include "config.h"
 
 ProcWatchSvr::~ProcWatchSvr()
 {
