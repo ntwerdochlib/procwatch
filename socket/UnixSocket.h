@@ -51,7 +51,7 @@ public:
    * @return true on sucess, false on failure
    */
   bool send(const std::string& buffer) {
-    return send(buffer.data(), buffer.size() + 1);
+    return send(buffer.data(), buffer.size());
   }
   /**
    * @copydoc Socket::recv
