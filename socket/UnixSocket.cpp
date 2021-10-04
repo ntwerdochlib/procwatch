@@ -121,7 +121,7 @@ bool UnixSocket::send(const void* buffer, std::size_t bytes, std::size_t* bytesS
 bool UnixSocket::recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd)
 {
   auto const r = read(m_handle, buffer, bytes);
-  if (*bytesRcvd) {
+  if (bytesRcvd) {
     *bytesRcvd = r;
   }
   // std::cout << __func__ << ": r: " << r << " errno: " << errno << std::endl;
