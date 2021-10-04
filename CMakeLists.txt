@@ -8,6 +8,8 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_subdirectory(docs)
+
 set(srcs
   socket/Socket.h
   socket/UnixSocket.h

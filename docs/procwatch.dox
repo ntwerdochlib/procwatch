@@ -1,0 +1,4 @@
+/**
+@page procwatch procwatch
+This is the client, which once run it connects to the process watcher server and displays information recieved for any new processes created starting from the time of the connection.
+*/

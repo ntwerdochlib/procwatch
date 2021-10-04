@@ -1,0 +1,36 @@
+@startuml(id=SERVER) Server
+start
+:Configure signals to trigger shutdown;
+:Setup epoll configuration;
+:Create Server Object;
+:Run server in new thread;
+fork
+  :Create netlink socket>
+  while(shutdown requested) is (false)
+    if (client connection requested) then
+      :accept connection<
+      if (Have existing client connection) then
+        :Notify client max connections have been reached>
+        :Disconnect client;
+      else
+        :Store connection has the active client;
+        :Inform netlink socket to listen for events>
+      endif
+    endif
+    if (netlink process message received) then
+      if (client still connected) then
+        :Read process message from netlink socket<
+        :Process message;
+        :Send process information to client>
+      else (ignore)
+      endif
+    endif
+    if (Client socket closed) then
+      :Delete local client object;
+      :Notify netlink socket to no longer listen for events>
+    endif
+  endwhile(true)
+end fork
+:Wait for shutdown signal;
+stop
+@enduml

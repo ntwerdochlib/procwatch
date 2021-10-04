@@ -1,0 +1,17 @@
+@startuml Client
+
+start
+:Configure signals to trigger shutdown;
+:Setup epoll configuration;
+:Connect to server domain socket>
+while (shutdown signal received and socket connected) is (false)
+  :Read data from socket<
+  if (Data recieved) then (true)
+    :Write data to standard out;
+  else (false)
+    :Close socket;
+  endif
+endwhile(true)
+stop
+
+@enduml

@@ -1,0 +1,125 @@
+/**
+
+@mainpage
+@tableofcontents
+
+@section sec1 Overview
+This project provides a simple implementation for viewing processes that are created after a specific point in time.  There are two binaries 
+provided from a build of the source code:
+
+@subpage process_watcher @n
+@subpage procwatch
+
+@section sec2 Design
+@subsection subsec2_1_1 Research Sources
+The following article <A href="https://natanyellin.com/posts/tracking-running-processes-on-linux/">The Difficulties of Tracking Running Processes on Linux</A>
+was used as a valuable source of information for design considerations.
+
+@subsection subsec2_1_2 Possible Methods For Process Detection
+@par
+There are quite a few options for monitoring processes being created on a linux based system however, there is no real solid solution.@n
+
+@subsubsection subsec2_1_2_1 /proc Filesystem
+@par
+One option is to monitor the /proc filesystem.  This option has a huge draw back, being that the /proc filesystem is a special filesystem
+and its contents change very frequently.  Thisk type of solution is guaranteed to have data misses.@n
+
+@subsubsection subsec2_1_2_2 Inside The Linux Kernel
+@par
+Another option is using a kernel module in which specific syscalls are hooked.  This option would guantee low data misses but still has
+drawbacks.  Recent linux kernels have had structural changes that now place a lot of requiremnts to be met in order to gain access to
+the syscalls.  A popular example of a utility using this method is <A href="https://github.com/kfiros/execmon">execmon</A>.  This application resorts to patching the
+kernel in realtime.  While effective, it has potential for disasterous failure both between distributions and perhaps even more sore
+between broad ranges of kernel versions.  This technique is also sure to make any security professional cringe (in a bad way).
+
+@par
+Additional issues with the kernel module approach is the need for the module to be built for specific kernel versions.  This creates an 
+excessive overhead on managing release versions.
+
+@subsubsection subsec2_1_2_3 The Linux audit API
+@par
+The Linux audit API could also be used and would likely be a good option.  It has one disadvantage being that only one usermode application 
+can add rules at a time.  This could impact other sercurity processes which also make use of the audit API.
+
+@subsubsection subsec2_1_2_4 The Linux netline Process Connector
+@par
+The Linux netlink process connector is a viable option.  Its only limitation being that only numerical data is provided.  To obtain binary path 
+and/or command line information, you need to rely on data in the /proc filesystem.  Although you have the information required to directly access 
+the files containing this information, for short lived processes this data could be gone by the time an attempt to read is performed.
+
+@note There is a bug that seems to exist still in very recent kernels: <A href="https://natanyellin.com/posts/buggy-netlink-process-connectors/">When Netlink Process Connectors Don’t Process</A>.
+  I did run into this bug during development.  Given that I am not sure if trying to fix the bad @a proc_event_num_listeners value by sending extra 
+PROC_CN_MCAST_IGNORE messages to the netlink socket wouldn't in turn cause other system issues, along with considering the boot time of the server used
+for development, I chose to let it works itself out.
+
+@subsection subsec2_2 Proposed Design
+@par
+The design demonstrated here makes use of the Linux netlink process connector.  This method was choosen since it provides good functional support 
+with minimal impacts to the system being run on.
+
+@subsubsection subsec2_2_1 server
+@par
+The @ref process_watcher binary will implement a typical server paradigm, where it will create a known unix domain socket and listen for client connections.  
+This particular implementation will not provide for multiple client support, but could be extended to provide this support.  Since this implementation 
+limits to a single client connection, the server will establish and maintain the netlink process connector connection.  It will only request for events 
+to be sent from the netlink connection during the lifespan of a client connection.  Once a client has disconnected, the server will request for process 
+events to no longer be recieved from the netlink connection and then renter the accepting a client connection state.  The server will shutdown in 
+response to a SIGHUP, SIGINT, SIGTERM, or SIGQUIT signal.  Given this is for demonstration purposes the server binary does not offer a daemon mode.  
+Given that the server must be run with root privileges, it opens up the permissions on the known domain socket so that the client can be run without root 
+privileges.
+
+@startuml{Server.png} "Server UML Diagram"
+!include ./server.plantuml
+@enduml
+
+@subsubsection subsec_2_2_2 client
+@par
+The client, @ref procwatch, is a very simple client application.  When run, it establishes a connection to the known domain socket and waits for messages 
+to be recieved from the server.  Messages that are recieve are echoed to standard out.  The client will shutdown in response to a SIGHUP, SIGINT 
+(Control-C within a terminal), SIGTERM, or SIGQUIT signal.
+
+@startuml{client.png} "Client UML Diagram"
+!include ./client.plantuml
+@enduml
+
+@par
+Both the server and the client make use of Linux epoll functionality in order to be as efficient as possible while waiting for events.
+
+@subsection subsec2_3 Testing
+@par
+Testing was performed on the following releases:
+
+ - Debian 11 Bullseye X64
+ - Linux Mint 20.2 Uma X64
+ - Debian 10 Buster armv71
+
+@section sec3 Assumptions & Limitations
+@par
+root privileges are required to run the @ref process_watcher binary
+
+@par
+The current version of the code does run into cases where for process whose lifetime is shorting the servers detection/processing interval resulting in not 
+being able to retrieve the binary path and command line.  In these cases the values "[Unable To Retrieve Command Line]" and "[Unable To Retrieve Command Line]" 
+will be displayed repsectively
+
+@par
+Currently the socket file is created in the @a /tmp directory.  A more viable option would allow the location to be configurable.
+
+@section sec4 Future Changes
+@subsection subsec4_1 Securing the IPC in a real-world application
+The secrity unix domain socket used for accepting connections can be more tightly controlled using the following options:
+
+ - Using the @a chmod() / @a chown() Linux api calls to modify permissions/ownership of the socket path betwneed the call to @a bind() and the call to @a listen() is made.
+ - The credentials of the client process can be sent over the socket connection and verified by the server side, and then rejected if eligibility is not met.
+
+@subsection subsec4_2 Support for tracking file handles opened by new processes
+@par
+The server application could be extended to offer the tracking of file handles on new processes by monitoring the /proc/PID/fd directory.  A soft link is added to this 
+location for every file descriptor created by the associated process.  The soft link will identify the descriptor as a pipe, socket, fifo, file, etc..
+@n
+Examples of these can be seen using the follow command:
+@code
+ls -l /proc/[0-9]*/fd/[0-9]*
+@endcode
+
+*/
