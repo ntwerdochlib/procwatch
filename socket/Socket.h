@@ -39,14 +39,6 @@ class Socket {
   virtual bool connect() = 0;
 
   /**
-   * @brief Override to implement socket listen functionality
-   * @return true on success, false on failure
-   */
-  virtual bool listen() {
-    return false;
-  }
-
-  /**
    * @brief Override to implement socket send functionality
    * @return true on success, false on failure
    */

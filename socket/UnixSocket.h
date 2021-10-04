@@ -35,10 +35,6 @@ public:
    */
   bool connect() override;
   /**
-   * @copydoc Socket::listen
-   */
-  bool listen() override;
-  /**
    * @brief Setup the socket to listen for connections
    * @param everyone - true to allow any process to connect, false to keep the permissions of the process calling listen()
    * @return true on sucess, false on failure

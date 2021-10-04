@@ -51,11 +51,6 @@ bool UnixSocket::connect()
   return true;
 }
 
-bool UnixSocket::listen()
-{
-  return listen(false);
-}
-
 bool UnixSocket::listen(bool everyone)
 {
   if (m_handle == InvalidSocketHandle) {
