@@ -26,7 +26,6 @@ set(srcs
 )
 
 add_executable(procwatch ${srcs})
-#target_include_directories(procwatch PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(procwatch PRIVATE pw_socket)
 
 set(srcs
@@ -35,9 +34,5 @@ set(srcs
   ProcWatchSvr.cpp
 )
 
-add_executable(procwatchd ${srcs})
-#target_include_directories(procwatchd PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(procwatchd PRIVATE pw_socket pthread)
-
-add_executable(test_netlink test/TestNetlinkSocket.cpp)
-target_link_libraries(test_netlink PRIVATE pw_socket)
+add_executable(process_watcher ${srcs})
+target_link_libraries(process_watcher PRIVATE pw_socket pthread)
