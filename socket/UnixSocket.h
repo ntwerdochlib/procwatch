@@ -18,6 +18,7 @@ public:
   bool create() override;
   bool connect() override;
   bool listen() override;
+  bool listen(bool everyone);
   bool send(const void* buffer, std::size_t bytes, std::size_t* bytesSent = nullptr) override;
   bool recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd = nullptr) override;
   bool close() override;

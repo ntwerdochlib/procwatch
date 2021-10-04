@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/un.h>
 
 #include <iostream>
@@ -52,6 +53,11 @@ bool UnixSocket::connect()
 
 bool UnixSocket::listen()
 {
+  return listen(false);
+}
+
+bool UnixSocket::listen(bool everyone)
+{
   if (m_handle == InvalidSocketHandle) {
     errx(ENOTSOCK, "Invalid socket handle");
     return false;
@@ -77,7 +83,11 @@ bool UnixSocket::listen()
     return false;
   }
 
-  r = ::listen(m_handle, 10);
+  if (everyone) {
+    // allow a non root privilege process to connect to the socket
+    chmod(m_endpoint.c_str(), 0777);
+  }
+
   if (r == -1) {
     err(errno, "Unable to configure socket %s for accepting connections", name());
     return false;
