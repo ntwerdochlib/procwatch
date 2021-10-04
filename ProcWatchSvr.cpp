@@ -25,7 +25,7 @@ void ProcWatchSvr::run(std::stop_token stopToken)
     throw std::runtime_error("failed to create server socket");
   }
 
-  if (!serverSocket.listen(true)) {
+  if (!serverSocket.listen(true, 1)) {
     throw std::runtime_error("failed listening on socket");
   }
 
