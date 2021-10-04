@@ -65,11 +65,11 @@ bool UnixSocket::listen(bool everyone, uint32_t queueSize)
 
   if (m_endpoint[0] != 0x00) {
     // Only unlink for non hidden domain sockets
-  auto r = unlink(m_endpoint.c_str());
-  if (r != 0 && errno != ENOENT) {
+    auto r = unlink(m_endpoint.c_str());
+    if (r != 0 && errno != ENOENT) {
       err(errno, "%d Failed to remove existing socket endpoint for %s", errno, name());
-    return false;
-  }
+      return false;
+    }
   }
 
   auto r = bind(m_handle, reinterpret_cast<sockaddr*>(&sa), sizeof(sa));
@@ -128,18 +128,9 @@ bool UnixSocket::recv(void* buffer, std::size_t bytes, std::size_t* bytesRcvd)
   return true;
 }
 
-std::shared_ptr<UnixSocket> UnixSocket::waitForConnection()
+std::shared_ptr<UnixSocket> UnixSocket::acceptConnection()
 {
   auto conn = accept(m_handle, nullptr, nullptr);
-  if (conn == -1) {
-    throw std::runtime_error(strerror(errno));
-  }
-  return std::shared_ptr<UnixSocket>(new UnixSocket(conn));
-}
-
-std::shared_ptr<UnixSocket> UnixSocket::acceptConnection(int handle)
-{
-  auto conn = accept(handle, nullptr, nullptr);
   if (conn == -1) {
     throw std::runtime_error(strerror(errno));
   }
